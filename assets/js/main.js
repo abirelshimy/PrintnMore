@@ -349,6 +349,9 @@
   });
   layout();
   window.addEventListener('load', layout);
+  // The hero title is a different size in each hero style, so its marquee is
+  // re-measured on a switch (or its loop would jump).
+  document.addEventListener('hero:variant', () => marquees.forEach(buildMarquee));
   // Titles are sized from measured text, so re-measure once the web fonts arrive.
   if (document.fonts) {
     document.fonts.ready.then(layout);
