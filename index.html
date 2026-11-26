@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/style.css?v=20261125-10">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"Print n More","url":"https://printnmore.com/","logo":"https://printnmore.com/assets/img/logo.png","image":"https://printnmore.com/assets/img/og.jpg","telephone":"+1-305-232-7098","faxNumber":"+1-786-623-0786","email":"hello@printnmore.com","foundingDate":"1990","address":{"@type":"PostalAddress","streetAddress":"12190 SW 131st Ave","addressLocality":"Miami","addressRegion":"FL","postalCode":"33186","addressCountry":"US"},"areaServed":["Miami-Dade County","Broward County","Palm Beach County"],"sameAs":["https://www.facebook.com/Printnmore/","https://www.instagram.com/printnmore/"]}
 </script>
@@ -56,18 +56,46 @@
 </div>
 
 <main id="main">
-<section class="hero" data-hero>
+<section class="hero" data-hero data-hero-variant="fold">
+  <script>/* Pick the hero style before first paint: ?hero=… or the last one chosen. */try{var v=new URLSearchParams(location.search).get('hero')||localStorage.getItem('pnm-hero');if(/^(fold|floats)$/.test(v))document.currentScript.parentNode.setAttribute('data-hero-variant',v)}catch(e){}</script>
   <div class="ink" aria-hidden="true"><span class="blob blob--c"></span><span class="blob blob--m"></span><span class="blob blob--y"></span></div><div class="grain" aria-hidden="true"></div>
-  <div class="hero-stage">
+  <div class="hero-stage" data-fold-stage>
   <svg class="reg reg--l" viewBox="0 0 26 26" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="13" cy="13" r="6.5"/><path d="M13 0v26M0 13h26"/></svg><svg class="reg reg--r" viewBox="0 0 26 26" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="13" cy="13" r="6.5"/><path d="M13 0v26M0 13h26"/></svg>
+
+  <!-- Hero style picker (assets/js/main.js). Remove it once a style is chosen. -->
+  <div class="hero-switch" role="group" aria-label="Hero style">
+    <button type="button" data-hero-pick="fold" aria-pressed="true">Fold</button>
+    <button type="button" data-hero-pick="floats" aria-pressed="false">Floating</button>
+  </div>
+
+  <!-- Style "floats" · Floating photos (the original). Any size works; ~1200 px on
+       the long side is plenty. -->
   <div class="hero-floats" aria-hidden="true">
-    <div class="float float--front f1" data-depth="0.35"><div class="float-in" style="--i:0"><img src="assets/img/work-hat.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--back f2" data-depth="0.18"><div class="float-in" style="--i:1"><img src="assets/img/work-business-cards.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--front f3" data-depth="0.5"><div class="float-in" style="--i:2"><img src="assets/img/work-lobby-sign.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--back f4" data-depth="0.26"><div class="float-in" style="--i:3"><img src="assets/img/svc-signs.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--back f5" data-depth="0.3"><div class="float-in" style="--i:4"><img src="assets/img/work-promo-kit.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--front f6" data-depth="0.62"><div class="float-in" style="--i:5"><img src="assets/img/screen-printing.jpg" alt="" width="600" height="600"></div></div>
-    <div class="float float--front f7" data-depth="0.44"><div class="float-in" style="--i:6"><img src="assets/img/svc-awards.jpg" alt="" width="600" height="600"></div></div>
+    <div class="float float--front f1" data-depth="0.35"><div class="float-in" style="--i:0"><img src="assets/img/hero-polo.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--back f2" data-depth="0.18"><div class="float-in" style="--i:1"><img src="assets/img/hero-prints.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--front f3" data-depth="0.5"><div class="float-in" style="--i:2"><img src="assets/img/hero-tumblers.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--back f4" data-depth="0.26"><div class="float-in" style="--i:3"><img src="assets/img/hero-cap.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--back f5" data-depth="0.3"><div class="float-in" style="--i:4"><img src="assets/img/hero-business-cards.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--front f6" data-depth="0.62"><div class="float-in" style="--i:5"><img src="assets/img/hero-apparel.webp" alt="" width="1200" height="1530"></div></div>
+    <div class="float float--front f7" data-depth="0.44"><div class="float-in" style="--i:6"><img src="assets/img/hero-tee-mug.webp" alt="" width="1200" height="1530"></div></div>
+  </div>
+
+  <!-- Style "fold" · Fold carousel (assets/js/fold.js), with the title right
+       under it. The centre card lies flat and its neighbours fold away like
+       doors; it steps on by itself and can be dragged sideways. Photo 1 starts
+       in the centre. Each card's words come from its data-title / data-subtitle /
+       data-tag / data-caption (leave one out to drop it). Card and title sizes:
+       --fold-card / --fold-title in style.css. Best size: 1200 × 1500 px (4:5). -->
+  <div class="hero-fold" data-fold aria-hidden="true">
+    <div class="fold-gl"></div>
+    <div class="fold-slot"></div>
+    <img src="assets/img/hero-prints.webp" alt="" width="1200" height="1530" data-title="Print &amp; Design" data-subtitle="Postcards &amp; mailers" data-tag="Print" data-caption="Short &amp; long runs">
+    <img src="assets/img/hero-polo.webp" alt="" width="1200" height="1530" data-title="Custom Apparel" data-subtitle="Embroidered polos" data-tag="Apparel" data-caption="Your logo, stitched">
+    <img src="assets/img/hero-tumblers.webp" alt="" width="1200" height="1530" data-title="Promotional Items" data-subtitle="Custom tumblers" data-tag="Promo" data-caption="Gifts with your brand">
+    <img src="assets/img/hero-business-cards.webp" alt="" width="1200" height="1530" data-title="Print &amp; Design" data-subtitle="Business cards" data-tag="Print" data-caption="Design &middot; Print &middot; Finish">
+    <img src="assets/img/hero-apparel.webp" alt="" width="1200" height="1530" data-title="Custom Apparel" data-subtitle="Team &amp; staff wear" data-tag="Apparel" data-caption="Jackets &middot; Bags &middot; Caps">
+    <img src="assets/img/hero-cap.webp" alt="" width="1200" height="1530" data-title="Custom Apparel" data-subtitle="Caps &amp; wristbands" data-tag="Apparel" data-caption="Made in Miami">
+    <img src="assets/img/hero-tee-mug.webp" alt="" width="1200" height="1530" data-title="Promotional Items" data-subtitle="Tees &amp; mugs" data-tag="Promo" data-caption="Made on premises">
   </div>
   <h1 class="hero-title">
     <span class="sr-only">Print n More: Miami printing company since 1990</span>
@@ -373,6 +401,7 @@
   </div>
 </footer>
 
-<script src="assets/js/main.js" defer></script>
+<script src="assets/js/main.js?v=20261125-10" defer></script>
+<script src="assets/js/fold.js?v=20261125-10" defer></script>
 </body>
 </html>

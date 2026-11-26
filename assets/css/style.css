@@ -141,13 +141,14 @@ em {
   pointer-events: none;
 }
 .nav > * { pointer-events: auto; }
-.nav-brand { display: block; }
+/* The logo sits a little in from the page margin. */
+.nav-brand { display: block; margin-left: clamp(0px, 2.5vw, 40px); }
 .nav-brand img {
-  width: auto; height: 60px;
+  width: auto; height: 84px;
   transition: height 0.5s var(--ease-out), transform 0.6s var(--ease-out);
 }
 .nav-brand:hover img { transform: rotate(-5deg) scale(1.05); }
-.is-scrolled .nav-brand img { height: 46px; }
+.is-scrolled .nav-brand img { height: 58px; }
 .nav-actions { display: flex; align-items: center; gap: 10px; }
 
 .menu-btn {
@@ -252,8 +253,33 @@ em {
   background: var(--paper);
 }
 .hero-stage { position: relative; height: 100vh; height: 100svh; min-height: 640px; }
-.hero-floats { position: absolute; inset: 0; }
-.float { position: absolute; will-change: transform; }
+
+/* Two hero styles; only the picked one shows (data-hero-variant on .hero). */
+.hero:not([data-hero-variant="floats"]) .hero-floats,
+.hero:not([data-hero-variant="fold"]) .hero-fold { display: none; }
+
+/* Hero style picker */
+.hero-switch {
+  position: absolute; left: 50%; top: 22px; z-index: 5; transform: translateX(-50%);
+  display: flex; gap: 2px; padding: 4px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82); box-shadow: 0 8px 28px rgba(14, 14, 18, 0.12);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  animation: fade 1.2s ease both 0.9s;
+}
+.hero-switch button {
+  height: 40px; padding: 0 16px; border-radius: 999px;
+  font-size: 13px; font-weight: 500; letter-spacing: 0.01em; white-space: nowrap;
+  transition: background 0.35s var(--ease), color 0.35s var(--ease);
+}
+.hero-switch button:hover { background: rgba(14, 14, 18, 0.06); }
+.hero-switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* Floating photos (the original hero), all behind the title. They rise from
+   below the stage and out past the top on a loop; nearer (front) photos rise
+   faster. --rise is one trip, --at where along it the photo starts. The rise
+   uses `translate`, so it adds to main.js's scroll/pointer `transform`. */
+.hero-floats { position: absolute; inset: 0; z-index: 1; }
+.float { position: absolute; will-change: transform, translate; }
 .float-in {
   width: 100%; height: 100%;
   animation: float-in 1.6s var(--ease-out) both;
@@ -273,6 +299,53 @@ em {
 .f5 { left: 11%; top: 64%; width: 13vw; aspect-ratio: 4 / 3; }
 .f6 { left: 41%; top: 69%; width: 12vw; aspect-ratio: 16 / 10; }
 .f7 { right: 12%; top: 61%; width: 10vw; aspect-ratio: 3 / 4; }
+@media (prefers-reduced-motion: no-preference) {
+  .hero-floats .float {
+    top: 100%;
+    animation: float-rise var(--rise) linear infinite;
+    animation-delay: calc(var(--rise) * var(--at) * -1);
+  }
+  .f1 { --rise: 30s; --at: 0.22; }
+  .f2 { --rise: 36s; --at: 0.5; }
+  .f3 { --rise: 26s; --at: 0.62; }
+  .f4 { --rise: 34s; --at: 0.86; }
+  .f5 { --rise: 32s; --at: 0.72; }
+  .f6 { --rise: 23s; --at: 0.16; }
+  .f7 { --rise: 28s; --at: 0.36; }
+}
+/* One trip: from just under the stage to just above it. */
+@keyframes float-rise { to { translate: 0 calc(-1 * max(100svh, 640px) - 100%); } }
+
+/* Fold carousel (WebGL). Drags are taken on the whole stage.
+   The cards and the title below them are laid out as one centred group:
+   --fold-card is the centre card's height (a % is of the stage height),
+   --fold-title the title's size and --fold-gap the space between them.
+   fold.js frames the 3D cards to fill .fold-slot, so these numbers are the
+   only place to change the size. */
+.hero-stage {
+  --fold-card: min(46%, 34vw);
+  --fold-title: min(9vw, calc(max(100svh, 640px) * 0.12));
+  --fold-gap: 2%;
+  --fold-top: calc((100% - var(--fold-card) - var(--fold-gap) - var(--fold-title)) / 2);
+}
+.hero-fold { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.hero-fold img { display: none; }
+.fold-slot {
+  position: absolute; left: 50%; top: var(--fold-top); transform: translateX(-50%);
+  height: var(--fold-card); aspect-ratio: 4 / 5;
+  border-radius: 3.6% / 2.88%; overflow: hidden;
+}
+/* No WebGL: photo 1 stands still in the centre card's place. */
+.hero-fold .fold-slot img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.fold-gl { position: absolute; inset: 0; animation: stage-in 1.8s var(--ease-out) both 0.25s; }
+.fold-gl canvas { display: block; width: 100%; height: 100%; }
+[data-hero-variant="fold"] .hero-title {
+  top: calc(var(--fold-top) + var(--fold-card) + var(--fold-gap));
+  transform: none; font-size: var(--fold-title);
+}
+@keyframes stage-in { from { opacity: 0; transform: translateY(60px) scale(0.94); } }
+[data-hero-variant="fold"] [data-fold-stage][data-draggable] { cursor: grab; user-select: none; -webkit-user-select: none; touch-action: pan-y pinch-zoom; }
+[data-hero-variant="fold"] [data-fold-stage][data-dragging] { cursor: grabbing; }
 
 .hero-title {
   position: absolute; left: 0; right: 0; top: 50%; z-index: 2;
@@ -326,12 +399,14 @@ em {
 @keyframes marquee { to { transform: translate3d(calc(-1 * var(--shift, 50%)), 0, 0); } }
 .star { display: inline-block; flex: none; width: 0.5em; height: 0.5em; fill: currentColor; }
 
-/* ---------- Giant section titles ---------- */
+/* ---------- Giant section titles ----------
+   font-size is the largest a title gets: main.js shrinks a long one to fit
+   the width, and short ones stop here. */
 .mega {
   --mis: 0;
   display: block; padding-inline: var(--gutter);
   text-align: center; text-transform: uppercase; white-space: nowrap;
-  font-size: 18vw; font-weight: 400; line-height: 0.8;
+  font-size: 13vw; font-weight: 400; line-height: 0.8;
   padding-top: 0.06em;
 }
 /* letter-spacing + shadows live on the fitted span so their em units scale with it */
@@ -573,9 +648,9 @@ em {
 /* ---------- Sub-page hero ---------- */
 .page-hero {
   position: relative; z-index: 0; isolation: isolate; overflow: hidden;
-  min-height: 82vh; min-height: 82svh;
+  min-height: 52vh; min-height: 52svh;
   display: flex; flex-direction: column; justify-content: flex-end;
-  padding: calc(var(--nav-h) + 10vh) 0 clamp(40px, 5vw, 72px);
+  padding: calc(var(--nav-h) + 6vh) 0 clamp(40px, 5vw, 72px);
   background: var(--paper);
 }
 .page-hero .ink { opacity: 0.42; }
@@ -649,8 +724,14 @@ em {
 .press-band img { position: absolute; inset: -10% 0; width: 100%; height: 120%; object-fit: cover; will-change: transform; }
 
 /* ---------- Contact page ---------- */
+/* The big number stays on one line at every width: it grows with the window
+   but never past what fits its column (the number is about 6.2em wide).
+   cqi is 1% of the .phone-row's width. */
+.phone-row { container-type: inline-size; }
 .big-phone {
-  display: inline-block; font-size: clamp(2.6rem, 8vw, 8.4rem); font-weight: 400; line-height: 1; letter-spacing: -0.05em;
+  display: inline-block; white-space: nowrap;
+  font-size: min(clamp(2.6rem, 8vw, 8.4rem), calc((100cqi - var(--gutter)) * 1.3 / 2.3 / 6.2));
+  font-weight: 400; line-height: 1; letter-spacing: -0.05em;
   background: linear-gradient(var(--magenta), var(--magenta)) 0 92% / 0 0.06em no-repeat;
   transition: background-size 0.7s var(--ease);
 }
@@ -690,12 +771,13 @@ em {
 
 @media (max-width: 900px) {
   :root { --nav-h: 80px; }
-  .nav-brand img { height: 50px; }
-  .is-scrolled .nav-brand img { height: 42px; }
+  .nav-brand img { height: 62px; }
+  .is-scrolled .nav-brand img { height: 48px; }
   .nav-cta { display: none; }
   .menu-btn { width: 52px; height: 52px; }
 
   .hero-title { font-size: 27vw; }
+  .hero-stage { --fold-card: min(44%, 64vw); --fold-title: 19vw; }
   .f1 { left: 4%; top: 15%; width: 26vw; }
   .f2 { display: none; }
   .f3 { right: 6%; top: 17%; width: 28vw; }
@@ -704,6 +786,9 @@ em {
   .f6 { display: none; }
   .f7 { right: 8%; top: 64%; width: 26vw; }
   .reg { display: none; }
+  /* Phones: the picker drops below the logo and menu button. */
+  .hero-switch { top: 92px; }
+  .hero-switch button { height: 34px; padding: 0 12px; font-size: 12px; }
   .hero-foot { grid-template-columns: 1fr 1fr; }
   .hero-foot .scroll-down { display: none; }
 
@@ -724,6 +809,8 @@ em {
 
   .page-hero-row, .svc-grid, .split, .contact-grid { grid-template-columns: minmax(0, 1fr); }
   .page-hero-row .lead { justify-self: start; }
+  .big-phone { font-size: min(clamp(2.6rem, 8vw, 8.4rem), calc(100cqi / 6.2)); } /* one column here */
+  .phone-row .lead { justify-self: center; }
   .svc-aside { position: relative; top: auto; }
 }
 
@@ -737,6 +824,7 @@ em {
   .cta .pill { height: 52px; padding: 0 18px; font-size: 14px; }
   .cta-avatar { width: 52px; height: 52px; }
   .hero-foot { font-size: 12.5px; }
+  .mega { font-size: 16vw; }
   .form { grid-template-columns: 1fr; }
   .work-head { flex-direction: column; align-items: flex-start; }
 }

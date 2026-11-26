@@ -53,7 +53,11 @@
     return $$('.w', el);
   };
 
-  /* ---------- Fit giant titles to the full width ---------- */
+  /* ---------- Fit giant type to the width ----------
+     The footer wordmark fills the width. A giant section title (.mega) grows
+     to fill it too but never past the .mega font-size in the CSS, so short
+     words like "Work" stay the same size as the rest instead of filling the
+     screen. */
   const fits = $$('[data-fit]');
   const fit = () => fits.forEach((el) => {
     const parent = el.parentElement;
@@ -68,7 +72,8 @@
       if (!w) return;
       size *= (avail * 0.995) / w;
     }
-    el.style.fontSize = `${size}px`;
+    const cap = parent.classList.contains('mega') ? parseFloat(cs.fontSize) : 0;
+    el.style.fontSize = `${cap ? Math.min(size, cap) : size}px`;
   });
 
   /* ---------- Seamless marquees ---------- */
@@ -112,9 +117,13 @@
   let mx = 0; let my = 0; let tmx = 0; let tmy = 0;
   let ticking = false;
   const request = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+  // Which hero style is showing (see the switcher below); the fold style
+  // runs from fold.js.
+  const floatsOn = () => hero && hero.dataset.heroVariant === 'floats';
 
   if (hero && finePointer && !reduce) {
     hero.addEventListener('pointermove', (e) => {
+      if (!floatsOn()) return;
       tmx = e.clientX / window.innerWidth - 0.5;
       tmy = e.clientY / window.innerHeight - 0.5;
       request();
@@ -129,7 +138,7 @@
     root.classList.toggle('is-scrolled', y > 40);
 
     // Hero floats: parallax on scroll + a gentle drift toward the pointer
-    if (hero && !reduce && y < H * 1.4) {
+    if (floatsOn() && !reduce && y < H * 1.4) {
       mx += (tmx - mx) * 0.08;
       my += (tmy - my) * 0.08;
       floats.forEach((f) => {
@@ -298,6 +307,30 @@
       const note = form.querySelector('[data-form-note]');
       if (note) note.textContent = 'Your email app should open with everything filled in. Rather talk? Call (305) 232-7098.';
     });
+  }
+
+  /* ---------- Hero style switcher ----------
+     Two looks for the home hero: the fold carousel and the original floating
+     photos. The pick is kept in ?hero= and on this device, so it sticks while
+     you click around. To ship just one, delete the .hero-switch element and
+     set data-hero-variant on the hero. */
+  const picks = $$('[data-hero-pick]');
+  if (hero && picks.length) {
+    const show = (v, save) => {
+      if (!picks.some((b) => b.dataset.heroPick === v)) v = picks[0].dataset.heroPick;
+      hero.dataset.heroVariant = v;
+      picks.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.heroPick === v)));
+      if (save) {
+        try { localStorage.setItem('pnm-hero', v); } catch (e) { /* private mode */ }
+        const url = new URL(window.location.href);
+        url.searchParams.set('hero', v);
+        window.history.replaceState(null, '', url);
+      }
+      document.dispatchEvent(new CustomEvent('hero:variant', { detail: v }));
+      request();
+    };
+    picks.forEach((b) => b.addEventListener('click', () => show(b.dataset.heroPick, true)));
+    show(hero.dataset.heroVariant, false);
   }
 
   /* ---------- Misc ---------- */
