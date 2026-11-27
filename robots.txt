@@ -1,0 +1,14 @@
+# Pre-launch copy of the Print n More site: keep it out of search engines.
+# Every page also has <meta name="robots" content="noindex">.
+# Remove this file and that tag at launch (see README, "Before launch").
+
+# Link-preview bots may read pages so shared links still show a preview card.
+User-agent: Twitterbot
+User-agent: facebookexternalhit
+User-agent: LinkedInBot
+User-agent: Slackbot
+Allow: /
+
+# Everyone else, including Google and Bing: stay out.
+User-agent: *
+Disallow: /
